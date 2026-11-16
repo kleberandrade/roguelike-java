@@ -54,3 +54,11 @@ Version/support references: [Java support roadmap](https://www.oracle.com/java/t
 - The user subsequently authorized pushing this repository and changing `master` to `main`, with CI monitoring until success. The earlier no-push notes describe the initial local modernization.
 - Confirmed the remote still pointed to the original `34c5815`, with no incoming commits and no existing `main` branch.
 - Updated the CI push trigger and badge to `main`, and documented how existing clones can update their tracking branch. Publication uses a normal fast-forward push; no force push or package deployment is involved.
+
+## Dependabot review and integration — 2026-11-16
+
+- Reviewed [PR #1](https://github.com/kleberandrade/roguelike-java/pull/1): Maven Resources Plugin 3.3.1 → 3.5.0, a single pinned build-plugin update. Verified that the existing packaged smoke check still compares `META-INF/LICENSE` with the canonical MIT license.
+- Reviewed [PR #2](https://github.com/kleberandrade/roguelike-java/pull/2): Maven Wrapper distribution 3.9.16 → 3.10.1, including the updated SHA-256. Validated a fresh wrapper download and Java 21 execution. Consulted the [Maven release notes](https://maven.apache.org/docs/3.10.1/release-notes.html), including stricter POM validation and Resolver/classpath changes; the project's explicit plugin versions and test-only JUnit dependency passed the real build.
+- Review verdict: both approved for integration; no critical, major or minor implementation findings and no author clarification needed. The updates keep versions and the distribution checksum pinned; no gameplay code, runtime dependency or CI permissions changed.
+- Both exact reviewed heads passed Linux/Windows PR checks and independent local `clean verify` runs with 29 tests and packaged smoke checks. The source example also passed with the new wrapper and after combining both upgrades. Merged through GitHub with SHA preconditions: #1 as `8568af8`, #2 as `2b03f7d`.
+- Updated the README's Maven badge and requirement text to 3.10.1. The earlier validation entries describe their original toolchain; new CI runs on `main` validate the combined upgrades.

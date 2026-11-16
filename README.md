@@ -1,7 +1,7 @@
 # Roguelike Java
 
 [![Java 21](https://img.shields.io/badge/Java-21_LTS-ED8B00?logo=openjdk)](https://adoptium.net/temurin/releases/?version=21)
-[![Maven 3.9.16](https://img.shields.io/badge/Maven-3.9.16-C71A36?logo=apachemaven)](https://maven.apache.org/)
+[![Maven 3.10.1](https://img.shields.io/badge/Maven-3.10.1-C71A36?logo=apachemaven)](https://maven.apache.org/)
 [![JUnit 6.1.3](https://img.shields.io/badge/JUnit-6.1.3-25A162?logo=junit5)](https://junit.org/)
 [![CI](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -19,7 +19,7 @@ A turn-based ASCII survival roguelike originally developed by Kléber de Oliveir
 - A terminal at least 100 columns wide for the default map. Narrow terminals wrap the output.
 - Python 3 only for the optional packaged application smoke checks.
 
-No Maven installation, NetBeans installation or runtime libraries are required. Java 21 is the supported build and execution baseline. The wrapper pins Maven 3.9.16 and checks its distribution SHA-256.
+No Maven installation, NetBeans installation or runtime libraries are required. Java 21 is the supported build and execution baseline. The wrapper pins Maven 3.10.1 and checks its distribution SHA-256.
 
 ## Quick start
 
