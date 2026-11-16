@@ -1,4 +1,4 @@
-package br.unisal.aula;
+package br.unisal.aula.domain;
 
 public class Personagem extends Entidade {
 
