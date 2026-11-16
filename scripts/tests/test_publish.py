@@ -42,7 +42,7 @@ class PublishTests(unittest.TestCase):
                        RELEASE_TAG=tag, RELEASE_VERSION=version, GH_REPO='owner/repo', GITHUB_SHA='a' * 40,
                        FAKE_PYTHON=sys.executable.replace(chr(92), "/"), FAKE_GH_SCRIPT=str(fake), FAKE_GH_LOG=str(log), FAKE_RELEASE_STATE=state)
             env.update(extra)
-            result = subprocess.run(['bash', SCRIPT.as_posix(), root.as_posix()], env=env, text=True, capture_output=True)
+            result = subprocess.run(['bash', '-x', SCRIPT.as_posix(), root.as_posix()], env=env, text=True, capture_output=True)
             calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
             return result, calls
 
@@ -73,11 +73,13 @@ class PublishTests(unittest.TestCase):
     def test_upload_failure_keeps_the_release_unpublished(self):
         result, calls = self.publish(FAKE_UPLOAD_FAIL='1')
         self.assertNotEqual(0, result.returncode)
+        self.assertIn('upload', [c[1] for c in calls if c[0] == 'release'])
         self.assertNotIn('edit', [c[1] for c in calls if c[0] == 'release'])
 
     def test_tag_must_still_point_to_the_built_commit(self):
         result, calls = self.publish(FAKE_TAG_SHA='b' * 40)
         self.assertNotEqual(0, result.returncode)
+        self.assertEqual('api', calls[0][0])
         self.assertFalse(any(c[0] == 'release' for c in calls))
 
     def test_prerelease_tags_are_marked_as_prereleases(self):
