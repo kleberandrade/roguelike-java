@@ -63,7 +63,7 @@ public class MundoBuilder {
             } while (mapa[x][y].isBloqueado());
 
             // Adiciona a criatura na lista de criaturas
-            Criatura zumbi = new Zumbi(new Ponto2D(x, y)); 
+            Personagem zumbi = new Zumbi(new Ponto2D(x, y)); 
             criaturas.add(zumbi);
         }
         return this;

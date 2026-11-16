@@ -1,6 +1,6 @@
 package br.unisal.aula;
 
-public class Zumbi extends Criatura {
+public class Zumbi extends Personagem {
     
     public static final char SIMBOLO = 'Z';
 

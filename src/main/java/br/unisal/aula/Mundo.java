@@ -29,7 +29,8 @@ public class Mundo {
     }
 
     public boolean bloqueado(int x, int y) {
-        return mapa[x][y].isBloqueado();
+        return x < 0 || y < 0 || x >= mapa.length || y >= mapa[0].length
+                || mapa[x][y].isBloqueado();
     }
 
     public void atualizar() {
