@@ -1,6 +1,7 @@
 """Exercise the publication state machine with a fake GitHub CLI, never the network."""
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -42,13 +43,16 @@ class PublishTests(unittest.TestCase):
                        RELEASE_TAG=tag, RELEASE_VERSION=version, GH_REPO='owner/repo', GITHUB_SHA='a' * 40,
                        FAKE_PYTHON=sys.executable.replace(chr(92), "/"), FAKE_GH_SCRIPT=str(fake), FAKE_GH_LOG=str(log), FAKE_RELEASE_STATE=state)
             env.update(extra)
-            result = subprocess.run(['bash', '-x', SCRIPT.as_posix(), root.as_posix()], env=env, text=True, capture_output=True)
+            bash = shutil.which('bash')
+            if os.name == 'nt':
+                bash = str(Path(shutil.which('git')).parents[1] / 'bin/bash.exe')
+            result = subprocess.run([bash, '-x', SCRIPT.as_posix(), root.as_posix()], env=env, text=True, capture_output=True)
             calls = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
             return result, calls
 
     def test_new_release_is_draft_until_both_assets_are_uploaded(self):
         result, calls = self.publish()
-        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         operations = [call[1] for call in calls if call[0] == 'release']
         self.assertEqual(['view', 'create', 'upload', 'edit'], operations)
         create = next(call for call in calls if call[:2] == ['release', 'create'])
@@ -62,12 +66,12 @@ class PublishTests(unittest.TestCase):
 
     def test_existing_draft_resumes_without_creating_another_release(self):
         result, calls = self.publish(state='true')
-        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertEqual(['view', 'upload', 'edit'], [c[1] for c in calls if c[0] == 'release'])
 
     def test_published_release_is_never_overwritten(self):
         result, calls = self.publish(state='false')
-        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertEqual(['view'], [c[1] for c in calls if c[0] == 'release'])
 
     def test_upload_failure_keeps_the_release_unpublished(self):
@@ -79,12 +83,13 @@ class PublishTests(unittest.TestCase):
     def test_tag_must_still_point_to_the_built_commit(self):
         result, calls = self.publish(FAKE_TAG_SHA='b' * 40)
         self.assertNotEqual(0, result.returncode)
+        self.assertTrue(calls, result.stdout + result.stderr)
         self.assertEqual('api', calls[0][0])
         self.assertFalse(any(c[0] == 'release' for c in calls))
 
     def test_prerelease_tags_are_marked_as_prereleases(self):
         result, calls = self.publish(tag='v2.3.4-rc.1')
-        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         edit = next(call for call in calls if call[:2] == ['release', 'edit'])
         self.assertIn('--prerelease=true', edit)
 
