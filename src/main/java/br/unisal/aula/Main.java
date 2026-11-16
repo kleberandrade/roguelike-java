@@ -38,7 +38,9 @@ public final class Main {
     }
 
     private static void usage(PrintWriter output) {
-        output.println("Usage: java -jar target/roguelike-java-1.0.0.jar [--seed <long> | --help]");
+        String version = Main.class.getPackage().getImplementationVersion();
+        if (version == null) version = "VERSION";
+        output.println("Usage: java -jar roguelike-java-" + version + ".jar [--seed <long> | --help]");
         output.println("W/A/S/D + Enter: move. Q + Enter: quit. Other input: wait.");
         output.flush();
     }

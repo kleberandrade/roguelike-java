@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """Exercise the packaged application; requires a completed Maven package."""
+import argparse
 from pathlib import Path
 import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-JAR = ROOT / "target/roguelike-java-1.0.0.jar"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--jar", type=Path, help="Executable JAR to verify")
+args = parser.parse_args()
+candidates = list((ROOT / "target").glob("roguelike-java-*.jar"))
+if args.jar is None and len(candidates) != 1:
+    parser.error("Build exactly one JAR or specify --jar")
+JAR = (args.jar if args.jar is not None else candidates[0]).resolve()
 
 
 def run(*args, commands="", status=0):
@@ -21,7 +28,9 @@ def run(*args, commands="", status=0):
 with zipfile.ZipFile(JAR) as archive:
     assert archive.read("META-INF/LICENSE") == (ROOT / "LICENSE").read_bytes()
 
-assert "--seed" in run("--help")
+help_text = run("--help")
+assert "--seed" in help_text
+assert JAR.name in help_text, help_text
 assert "Invalid arguments" in run("--seed", "invalid", status=2)
 assert "Partida encerrada." in run("--seed", "42")
 commands = (ROOT / "examples/replay.txt").read_text(encoding="utf-8")
