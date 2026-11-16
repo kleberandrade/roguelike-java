@@ -1,0 +1,110 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version to build for a dry run (never publishes a release)'
+        required: true
+        default: v1.0.0
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name }}-${{ github.ref }}-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate tag
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+        run: |
+          version=$(python scripts/release.py version "$RELEASE_TAG")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: version
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      RELEASE_VERSION: ${{ needs.version.outputs.version }}
+      RELEASE_TAG: ${{ needs.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Test release tooling
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Verify versioned build (Unix)
+        if: runner.os != 'Windows'
+        run: ./mvnw --batch-mode --no-transfer-progress "-Drevision=$RELEASE_VERSION" clean verify
+      - name: Verify versioned build (Windows)
+        if: runner.os == 'Windows'
+        run: ./mvnw.cmd --batch-mode --no-transfer-progress "-Drevision=$env:RELEASE_VERSION" clean verify
+      - name: Exercise versioned JAR
+        shell: bash
+        run: python scripts/smoke.py --jar "target/roguelike-java-$RELEASE_VERSION.jar"
+      - name: Run domain example
+        run: java --class-path target/classes examples/SurvivalExample.java
+      - name: Prepare JAR, checksum and English notes
+        if: runner.os == 'Linux'
+        run: |
+          python scripts/release.py prepare --tag "$RELEASE_TAG" \
+            --commit "$GITHUB_SHA" --repository "$GITHUB_REPOSITORY"
+          cd target/release
+          sha256sum --check "roguelike-java-$RELEASE_VERSION.jar.sha256"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: runner.os == 'Linux'
+        with:
+          name: release-${{ needs.version.outputs.tag }}
+          path: target/release/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [version, verify]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-${{ needs.version.outputs.tag }}
+          path: release
+      - name: Check downloaded artifact integrity
+        run: cd release && sha256sum --check *.jar.sha256
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ needs.version.outputs.version }}
+          RELEASE_TAG: ${{ needs.version.outputs.tag }}
+        run: bash scripts/publish-release.sh release

@@ -111,6 +111,35 @@ The [CI workflow](.github/workflows/ci.yml) runs the build, packaged JAR smoke c
 
 Build a custom arena with `MundoBuilder`, attach a `Jogador` using `setJogador`, then call `Mundo.atualizar(command)` to advance one turn. The builder requires dimensions of at least 3 × 3, `preencher` before carving/building, an interior walk origin and nonnegative walk/spawn counts. Requesting zombies without any floor throws immediately. Spawns sample floor cells with replacement, so a tiny arena remains valid. Direct `Mundo` construction expects a nonempty rectangular grid; use the builder for normal game creation. See the runnable example for concrete imports and setup.
 
+## Automated releases
+
+The [Release workflow](.github/workflows/release.yml) publishes a GitHub release when a tag matching `v*` is pushed. Use `vMAJOR.MINOR.PATCH` (for example `v1.0.1`) or a prerelease such as `v1.1.0-rc.1`. Invalid version tags fail validation. Prerelease tags produce GitHub prereleases.
+
+From a tested commit on `main`, create and push a new version tag:
+
+```sh
+git switch main
+git pull --ff-only
+git tag -a v1.0.1 -m "Release v1.0.1"
+git push origin v1.0.1
+```
+
+The tag supplies the Maven version through `-Drevision`; editing the POM for each release is unnecessary. Local builds default to the `revision` property in `pom.xml`. The JAR filename and executable manifest use the selected version.
+
+Before publication, the workflow builds and tests on Linux and Windows, runs the packaged smoke checks and source example, and verifies the JAR's version, entry point and MIT license. It then attaches `roguelike-java-VERSION.jar` and its `.jar.sha256` checksum and publishes [English release notes](docs/release-notes-template.md) with source and change-comparison links. Only the publication job receives repository write permission.
+
+Re-running an interrupted tag workflow resumes its draft release. Already published releases are preserved. The workflow also confirms that the tag still points to the commit used for the build.
+
+For a **dry run**, open **Actions → Release → Run workflow**, select `main` and enter a version tag. Manual runs build and upload the prepared JAR, checksum and notes as an Actions artifact, but never create tags or publish releases. Run the tooling tests locally with:
+
+```sh
+python3 -m unittest discover -s scripts/tests -v
+./mvnw -Drevision=1.0.1 clean verify
+python3 scripts/smoke.py --jar target/roguelike-java-1.0.1.jar
+```
+
+The existing `v1.0.0` release and its assets remain unchanged. Future version tags must point to commits containing the new workflow.
+
 ## Migration and limitations
 
 See [migration notes](docs/migration.md) for the NetBeans-to-Maven transition and source/package changes, and [the modernization log](docs/modernization-log.md) for validation evidence and tool limitations.

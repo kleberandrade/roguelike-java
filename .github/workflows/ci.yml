@@ -22,6 +22,8 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+      - name: Test release tooling
+        run: python -m unittest discover -s scripts/tests -v
       - name: Verify (Unix)
         if: runner.os != 'Windows'
         run: ./mvnw --batch-mode --no-transfer-progress clean verify
