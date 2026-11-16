@@ -11,3 +11,40 @@
 - Preserved survival rules, default dimensions, lives, zombie count, symbols, waiting on unknown input and overlap rules. Added explicit quit, clean EOF and defeat messages.
 - Replaced unbounded spawn retries with sampling existing floor cells (with replacement, preserving overlaps). Invalid generation now fails immediately.
 - Ran 17 JUnit tests successfully, including connectivity across 30 seeds. Dryer found no candidates at similarity 0.8. Crapper identified one CRAP 11 method; extracted walk validation to bring every method below 10.
+- Added pinned GitHub Actions for Linux/Windows, monthly dependency update configuration, a file-based CLI replay and a Java source-launcher example. Parsed workflow YAML and checked all relative documentation links.
+- Verified the Maven Wrapper from an empty temporary cache, including its SHA-256 distribution check, using Homebrew OpenJDK 21.0.13.0.3 on macOS ARM64.
+- Exercised the packaged JAR: help, invalid arguments/status 2, EOF, repeatable seed-42 replay and a complete waiting session ending in defeat. Ran the tiny domain arena: defeat after three turns.
+- Updated and independently read back GitHub About for `kleberandrade/roguelike-java`: “A turn-based Java ASCII survival roguelike with procedural caves, wandering zombies, and seeded replays.” Confirmed the default branch is `master`.
+- Replaced the README with English setup, controls, mechanics, runnable examples, API/package layout, migration notes and explicit limitations. Preserved the historical screenshot link and MIT license; retained Wrapper ASF headers and included Apache 2.0 licensing separately. Package the game license into the JAR without duplicating its source file.
+- First full mutation pass: 85 killed, 36 survived and 12 uncovered sites. Added behavioral checks for zero/overkill damage, asymmetric destination collisions, exact walk length/directions, independent border validation, floor-edge spawning, starting game rules and visible zombie rendering. All 28 tests passed. The surviving mutants supplied the observed failures for this test-strengthening pass.
+
+## Reproduction
+
+```sh
+./mvnw --batch-mode --no-transfer-progress clean verify
+python3 scripts/smoke.py
+java --class-path target/classes examples/SurvivalExample.java
+crapper --use-existing-coverage --threshold 9.99 src/main/java
+dryer --threshold 0.8 src/main/java
+mutator --use-existing-coverage --max-workers 2 --test-command './mvnw --batch-mode --no-transfer-progress test' src/main/java
+```
+
+The local run used a Maven artifact cache and wrapper cache under `/private/tmp` because Maven was not installed and the default macOS Java launcher had no configured runtime. `JAVA_HOME`/`PATH` pointed to the existing Homebrew JDK 21. All source edits and commits are confined to this repository. No push, package publication or deployment was performed.
+
+Version/support references: [Java support roadmap](https://www.oracle.com/java/technologies/java-se-support-roadmap.html), [Maven Central metadata](https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/maven-metadata.xml), [JUnit metadata](https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter/maven-metadata.xml), [Actions releases](https://github.com/actions/setup-java/releases).
+
+## Final validation and limits
+
+- Final clean Java 21 build: **29 JUnit tests passed**, no failures or errors. Packaged CLI smoke checks passed for help, invalid arguments, EOF, deterministic replay and an actual session ending in defeat. The standalone source example printed `Defeat after 3 turns.`
+- Added independent vertical collision and same-column/different-row contact checks after mutation analysis exposed those gaps. Coordinate comparisons also cover null and foreign types.
+- Crapper, using the final JaCoCo report: maximum CRAP **6**, all methods below 10. Dryer at threshold **0.8**: no duplicate candidates.
+- Cumulative mutator snapshot: **133 sites, 119 killed, 5 survived, 9 uncovered**. All executed gameplay-rule mutations were killed. Mutator exits with status 3 because five equivalent mutations remain: four change the coordinate hash formula while preserving equality/hash consistency; one reads the height from column 1 instead of column 0 in the rectangular world. No artificial exact-hash tests or ragged maps were added to force a score.
+- The nine uncovered mutation sites are the legacy coordinate diagnostic `toString` (five), the process launcher `Main.main` (three) and the retained convenience launcher `Jogo.executar` (one). The packaged smoke checks exercise the real process launcher, outside JaCoCo's unit-test JVM. Mutation discovery does not establish exhaustive coverage of Java language constructs or constructors.
+- Final JaCoCo unit-test report: 1,040/1,105 instructions, 192/205 lines and 104/107 branches covered. These are local measured results, not badge claims. The remaining gaps include process-bound I/O wrappers and retained diagnostic/accessor methods.
+- Fresh Maven Wrapper download and SHA-256 validation succeeded using a temporary cache. The JAR includes the unchanged MIT license under `META-INF/LICENSE`.
+- JAR SHA-256 matched across a clean rebuild: `1c40659c2f2f45a27e2ee9fab1db24f21e2833eb5c203190d76fefbc0d391b41`. This is a local reproducibility check, not a claim of binary equivalence across operating systems or JDK vendors.
+- Parsed both YAML configuration files, checked relative documentation links and ran `git diff --check` successfully. CI targets Linux/Windows but has not run remotely; local execution used macOS ARM64 and Homebrew OpenJDK 21.0.13.0.3.
+- GitHub About was updated and independently read back from `kleberandrade/roguelike-java`: **A turn-based Java ASCII survival roguelike with procedural caves, wandering zombies, and seeded replays.** Default branch confirmed as `master`.
+- No victory mechanic was invented: the original game remains survival until defeat or voluntary exit. Classroom roadmap ideas remain documented as unimplemented.
+- Original MIT copyright and screenshot remain intact. Maven Wrapper ASF headers are preserved, with the Apache 2.0 license included separately. No runtime third-party libraries were added.
+- Changes are committed locally in ordered build, domain/I/O, CI/example, test and documentation units. Push remains pending explicit authorization; no deployment or package publication was attempted.
