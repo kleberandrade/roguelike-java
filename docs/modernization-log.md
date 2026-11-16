@@ -48,3 +48,9 @@ Version/support references: [Java support roadmap](https://www.oracle.com/java/t
 - No victory mechanic was invented: the original game remains survival until defeat or voluntary exit. Classroom roadmap ideas remain documented as unimplemented.
 - Original MIT copyright and screenshot remain intact. Maven Wrapper ASF headers are preserved, with the Apache 2.0 license included separately. No runtime third-party libraries were added.
 - Changes are committed locally in ordered build, domain/I/O, CI/example, test and documentation units. Push remains pending explicit authorization; no deployment or package publication was attempted.
+
+## Authorized publication and branch migration
+
+- The user subsequently authorized pushing this repository and changing `master` to `main`, with CI monitoring until success. The earlier no-push notes describe the initial local modernization.
+- Confirmed the remote still pointed to the original `34c5815`, with no incoming commits and no existing `main` branch.
+- Updated the CI push trigger and badge to `main`, and documented how existing clones can update their tracking branch. Publication uses a normal fast-forward push; no force push or package deployment is involved.

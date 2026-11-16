@@ -26,3 +26,16 @@ Random choices now use bounded `nextInt` instead of floating-point modulo arithm
 Unknown/empty input and blocked moves still consume turns. Zombies still move after the player and deal contact damage after moving. Death ends survival; no victory mechanic has been added. Commands now also support `Q`, graceful EOF and `--seed`/`--help` arguments. `Fim de jogo!` explicitly reports defeat.
 
 The existing MIT license remains unchanged. The old screenshot remains at its original path, now linked relatively from the README.
+
+## Default branch rename
+
+The default branch is now `main`. For an existing clone with a local `master` branch, update the tracking configuration after saving any local work:
+
+```sh
+git branch -m master main
+git fetch origin
+git branch --set-upstream-to=origin/main main
+git remote set-head origin -a
+```
+
+Fresh clones select `main` automatically. CI push triggers and the README badge follow `main`.

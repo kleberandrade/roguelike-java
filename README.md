@@ -3,7 +3,7 @@
 [![Java 21](https://img.shields.io/badge/Java-21_LTS-ED8B00?logo=openjdk)](https://adoptium.net/temurin/releases/?version=21)
 [![Maven 3.9.16](https://img.shields.io/badge/Maven-3.9.16-C71A36?logo=apachemaven)](https://maven.apache.org/)
 [![JUnit 6.1.3](https://img.shields.io/badge/JUnit-6.1.3-25A162?logo=junit5)](https://junit.org/)
-[![CI](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml)
+[![CI](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A turn-based ASCII survival roguelike originally developed by Kléber de Oliveira Andrade for an Object-Oriented Programming course. Explore a procedurally carved cave and avoid wandering zombies. This modernization keeps the Portuguese game interface, original symbols and survival rules, with a portable build, deterministic replays and automated tests.
@@ -83,7 +83,7 @@ Use `./mvnw.cmd` and `python` on Windows. Tests exercise movement, wall/boundary
 
 `verify` creates JUnit reports in `target/surefire-reports/` and a measured JaCoCo report at `target/site/jacoco/index.html`. No coverage percentage or passing status is hardcoded in badges.
 
-The [CI workflow](.github/workflows/ci.yml) runs the build, packaged JAR smoke checks and source example on Linux and Windows with Temurin 21. Its badge reports GitHub's actual status; it will become available once this workflow is pushed. CI has not been run remotely as part of the local modernization. Dependabot checks Maven and Actions updates monthly.
+The [CI workflow](.github/workflows/ci.yml) runs the build, packaged JAR smoke checks and source example on Linux and Windows with Temurin 21. Its badge reports GitHub's actual status for the `main` branch. Dependabot checks Maven and Actions updates monthly.
 
 ## Code layout and API
 
