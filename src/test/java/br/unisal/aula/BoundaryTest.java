@@ -26,7 +26,7 @@ class BoundaryTest {
     @Test void edgeFloorIsWalkableAndOnlyTheDestinationControlsCollision() {
         Celula[][] cells = new Celula[5][5];
         for (int x = 0; x < 5; x++) for (int y = 0; y < 5; y++)
-            cells[x][y] = new Celula(x == 3 && y == 2, new Ponto2D(x, y), '.');
+            cells[x][y] = new Celula((x == 3 && y == 2) || (x == 2 && y == 3), new Ponto2D(x, y), '.');
         Mundo world = new Mundo(cells, List.of());
         assertFalse(world.bloqueado(0, 0));
         assertFalse(world.bloqueado(4, 4));
@@ -37,6 +37,11 @@ class BoundaryTest {
         assertEquals(1, player.getPassos());
         world.atualizar("A");
         assertEquals(new Ponto2D(1, 2), player.getPosicao());
+        world.atualizar("D");
+        world.atualizar("S");
+        assertEquals(new Ponto2D(2, 2), player.getPosicao());
+        world.atualizar("W");
+        assertEquals(new Ponto2D(2, 1), player.getPosicao());
     }
 
     @Test void numericValueDoesNotMakeAnUnknownTwoArgumentOptionValid() {
@@ -88,8 +93,8 @@ class BoundaryTest {
         world.setJogador(new Jogador(3, new Ponto2D(1, 1), 'J'));
         assertEquals("Z..\n.J.\n...\n", new ConsoleRenderer().render(world));
         Ponto2D point = new Ponto2D(1, 1);
-        assertNotEquals(null, point);
-        assertNotEquals("1,1", point);
+        assertFalse(point.equals(null));
+        assertFalse(point.equals("1,1"));
         assertEquals(point, new Ponto2D(1, 1));
     }
 }
