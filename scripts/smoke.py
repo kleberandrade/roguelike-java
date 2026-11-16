@@ -2,6 +2,7 @@
 """Exercise the packaged application; requires a completed Maven package."""
 from pathlib import Path
 import subprocess
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 JAR = ROOT / "target/roguelike-java-1.0.0.jar"
@@ -16,6 +17,9 @@ def run(*args, commands="", status=0):
     assert not result.stderr, result.stderr
     return result.stdout
 
+
+with zipfile.ZipFile(JAR) as archive:
+    assert archive.read("META-INF/LICENSE") == (ROOT / "LICENSE").read_bytes()
 
 assert "--seed" in run("--help")
 assert "Invalid arguments" in run("--seed", "invalid", status=2)
