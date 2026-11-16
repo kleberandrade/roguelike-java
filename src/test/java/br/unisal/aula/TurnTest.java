@@ -47,6 +47,12 @@ class TurnTest {
         assertEquals(steps, world.getJogador().getPassos());
     }
 
+    @Test void zombieInTheSameColumnButAnotherRowDoesNotDealDamage() {
+        Mundo world = floor(List.of(new Zumbi(new Ponto2D(2, 3), stay())));
+        world.atualizar("");
+        assertEquals(3, world.getJogador().getVidas());
+    }
+
     @Test void movingAwayBeforeZombiesActAvoidsDamage() {
         Mundo world = floor(List.of(new Zumbi(new Ponto2D(2, 2), stay())));
         world.atualizar("A");
