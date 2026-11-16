@@ -4,6 +4,7 @@
 [![Maven 3.10.1](https://img.shields.io/badge/Maven-3.10.1-C71A36?logo=apachemaven)](https://maven.apache.org/)
 [![JUnit 6.1.3](https://img.shields.io/badge/JUnit-6.1.3-25A162?logo=junit5)](https://junit.org/)
 [![CI](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kleberandrade/roguelike-java/actions/workflows/ci.yml)
+[![Release v1.0.0](https://img.shields.io/badge/Release-v1.0.0-2ea44f)](https://github.com/kleberandrade/roguelike-java/releases/tag/v1.0.0)
 [![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A turn-based ASCII survival roguelike originally developed by Kléber de Oliveira Andrade for an Object-Oriented Programming course. Explore a procedurally carved cave and avoid wandering zombies. This modernization keeps the Portuguese game interface, original symbols and survival rules, with a portable build, deterministic replays and automated tests.
@@ -14,7 +15,7 @@ A turn-based ASCII survival roguelike originally developed by Kléber de Oliveir
 
 ## Requirements
 
-- A JDK 21 distribution, such as Eclipse Temurin, with `java` on `PATH` and `JAVA_HOME` pointing to the JDK.
+- Java 21 to run the downloaded JAR. To build from source, install a JDK 21 distribution, such as Eclipse Temurin, with `java` on `PATH` and `JAVA_HOME` pointing to the JDK.
 - Internet access on the first build to download the pinned Maven distribution and test/build dependencies.
 - A terminal at least 100 columns wide for the default map. Narrow terminals wrap the output.
 - Python 3 only for the optional packaged application smoke checks.
@@ -22,6 +23,18 @@ A turn-based ASCII survival roguelike originally developed by Kléber de Oliveir
 No Maven installation, NetBeans installation or runtime libraries are required. Java 21 is the supported build and execution baseline. The wrapper pins Maven 3.10.1 and checks its distribution SHA-256.
 
 ## Quick start
+
+### Download v1.0.0
+
+[Download the executable JAR](https://github.com/kleberandrade/roguelike-java/releases/download/v1.0.0/roguelike-java-1.0.0.jar) and run it with Java 21:
+
+```sh
+java -jar roguelike-java-1.0.0.jar
+```
+
+See the [v1.0.0 release notes and checksum](https://github.com/kleberandrade/roguelike-java/releases/tag/v1.0.0) for details.
+
+### Build from source
 
 ```sh
 git clone https://github.com/kleberandrade/roguelike-java.git
